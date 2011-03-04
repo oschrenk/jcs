@@ -1,7 +1,7 @@
 
 
 /*
- * The Java Conflation Suite (JCS) is a library of Java classes that
+ * The JCS Conflation Suite (JCS) is a library of Java classes that
  * can be used to build automated or semi-automated conflation solutions.
  *
  * Copyright (C) 2003 Vivid Solutions
@@ -40,46 +40,23 @@ import com.vividsolutions.jump.feature.FeatureCollection;
 /**
  * Re-scales the scores output from another FeatureMatcher
  */
-public class ScaleScoresMatcher implements FeatureMatcher {
+public class ScoreStretcher implements FeatureMatcher {
 
   /**
-   * Creates a ScaleScoresMatcher without setting newZeroScore nor newFullScore.
-   * Be sure to set them.
+   * Creates a StretchFilter with the given control points.
+   * @param minScore the score that will be warped to 0
+   * @param maxScore the score that will be warped to 1
    */
-  public ScaleScoresMatcher() {
+  public ScoreStretcher(double minScore, double maxScore) {
+    this.minScore = minScore;
+    this.maxScore = maxScore;
   }
 
-  /**
-   * Creates a ScaleScoresMatcher with the given control points.
-   * @param newZeroScore the score that will be warped to 0
-   * @param newFullScore the score that will be warped to 1
-   */
-  public ScaleScoresMatcher(double newZeroScore, double newFullScore) {
-    setNewZeroScore(newZeroScore);
-    setNewFullScore(newFullScore);
-  }
+  private double minScore;
+  private double maxScore;
 
   /**
-   * Sets one of the control points.
-   * @param newZeroScore the score that will be warped to 0
-   */
-  public void setNewZeroScore(double newZeroScore) {
-    this.newZeroScore = newZeroScore;
-  }
-
-  private double newZeroScore = 0;
-  private double newFullScore = 1;
-
-  /**
-   * Sets one of the control points.
-   * @param newFullScore the score that will be warped to 1
-   */
-  public void setNewFullScore(double newFullScore) {
-    this.newFullScore = newFullScore;
-  }
-
-  /**
-   * Scales the scores so that #newZeroScore becomes 0 and #newFullScore
+   * Scales the scores so that #minScore becomes 0 and #maxScore
    * becomes 1. Scores outside of 0 and 1 get set to 0 and 1 respectively.
    * @param target ignored
    * @param candidates a Matches object created by another FeatureMatcher
@@ -96,7 +73,7 @@ public class ScaleScoresMatcher implements FeatureMatcher {
 
   private double convert(double oldScore) {
     //y = m x + b; v = m u + b
-    double x = newZeroScore, y = 0, u = newFullScore, v = 1;
+    double x = minScore, y = 0, u = maxScore, v = 1;
     double m = (y - v) / (x - u);
     double b = y - (m * x);
     return Math.min(1, Math.max(0, (m * oldScore) + b));

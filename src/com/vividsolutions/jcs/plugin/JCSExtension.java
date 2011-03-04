@@ -1,5 +1,5 @@
 /*
- * The Java Conflation Suite (JCS) is a library of Java classes that
+ * The JCS Conflation Suite (JCS) is a library of Java classes that
  * can be used to build automated or semi-automated conflation solutions.
  *
  * Copyright (C) 2003 Vivid Solutions
@@ -33,21 +33,25 @@
 package com.vividsolutions.jcs.plugin;
 
 import com.vividsolutions.jcs.plugin.clean.*;
+import com.vividsolutions.jcs.plugin.clean.coveragecleaningtoolbox.CoverageCleaningToolboxPlugIn;
 import com.vividsolutions.jcs.plugin.conflate.*;
+import com.vividsolutions.jcs.plugin.conflate.polygonmatch.PolygonMatcherToolboxPlugIn;
 import com.vividsolutions.jcs.plugin.conflate.roads.*;
 import com.vividsolutions.jcs.plugin.qa.*;
 import com.vividsolutions.jcs.plugin.test.VertexHausdorffDistancePlugIn;
 import com.vividsolutions.jcs.plugin.tools.*;
 import com.vividsolutions.jump.workbench.plugin.*;
 
-public class JCSConfiguration extends Extension {
+public class JCSExtension 
+    extends Extension 
+{
 
     public String getName() {
         return "JCS Conflation Suite";
     }
 
     public String getVersion() {
-        return "1.0";
+        return "1.0.1";
     }
 
   public void configure(PlugInContext context) throws Exception
@@ -80,8 +84,14 @@ public class JCSConfiguration extends Extension {
     new UpdateCoverageGapInFencePlugIn().initialize(context);
     new ShortSegmentRemoverPlugIn().initialize(context);
 
-    new PolygonMatchPlugIn().initialize(context);
-    new AngleHistogramPlugIn().initialize(context);
+    new PolygonMatcherToolboxPlugIn().initialize(context);
+    new CoverageCleaningToolboxPlugIn().initialize(context);
+    
+    //AngleHistogramPlugIn uses Chart2D, which I've removed from the
+    //build. TODO: Update it to use JFreeChart instead, which is better,
+    //and which I'm including in the build for polygon-matching. [Jon Aquino]
+    //new AngleHistogramPlugIn().initialize(context);
+    
     new TurningFunctionPlugIn().initialize(context);
 
     //These two were in the XML properties file, so I've added them here. [Jon Aquino]

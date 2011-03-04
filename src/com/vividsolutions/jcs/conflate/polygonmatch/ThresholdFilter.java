@@ -1,7 +1,7 @@
 
 
 /*
- * The Java Conflation Suite (JCS) is a library of Java classes that
+ * The JCS Conflation Suite (JCS) is a library of Java classes that
  * can be used to build automated or semi-automated conflation solutions.
  *
  * Copyright (C) 2003 Vivid Solutions
@@ -40,28 +40,15 @@ import com.vividsolutions.jump.feature.FeatureCollection;
 /**
  * Filters out shapes with a score below a given value.
  */
-public class MinScoreMatcher implements FeatureMatcher {
+public class ThresholdFilter implements FeatureMatcher {
 
   /**
-   * Creates a MinScoreMatcher with a minimum score of 0. Be sure to call
-   * #setMinScore.
-   */
-  public MinScoreMatcher() {
-  }
-
-  /**
-   * Creates a MinScoreMatcher with the given minimum score.
+   * Creates a ThresholdFilter with the given minimum score.
    * @param minScore the score below which shapes will be filtered out
    */
-  public MinScoreMatcher(double minScore) {
-    setMinScore(minScore);
+  public ThresholdFilter(double minScore) {
+    this.minScore = minScore;
   }
-
-  /**
-   * Sets the threshold score.
-   * @param minScore the score below which shapes will be filtered out
-   */
-  public void setMinScore(double minScore) { this.minScore = minScore; }
 
   private double minScore;
 

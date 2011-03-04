@@ -1,7 +1,7 @@
 
 
 /*
- * The Java Conflation Suite (JCS) is a library of Java classes that
+ * The JCS Conflation Suite (JCS) is a library of Java classes that
  * can be used to build automated or semi-automated conflation solutions.
  *
  * Copyright (C) 2003 Vivid Solutions
@@ -34,38 +34,43 @@
 
 package com.vividsolutions.jcs.conflate.polygonmatch;
 
-import java.util.Iterator;
-import java.util.Map;
-import java.util.TreeMap;
-
+import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jump.feature.Feature;
 import com.vividsolutions.jump.feature.FeatureCollection;
+import com.vividsolutions.jump.geom.EnvelopeUtil;
 
 /**
- * Applies a FeatureMatcher to each item in a FeatureCollection
+ * Quickly filters out shapes that lie outside a given distance from the feature's
+ * envelope.
  */
-public class FeatureCollectionMatcher {
+public class WindowFilter implements FeatureMatcher {
 
   /**
-   * Creates a FeatureCollectionMatcher that uses the given FeatureMatcher.
-   * @param matcher typically a composite of other FeatureMatchers
+   * Creates a new WindowFilter, with envelope buffering.
+   * @param buffer for each feature, the window will be the envelope extended on each
+   * side by this amount
    */
-  public FeatureCollectionMatcher(FeatureMatcher matcher) {
-    this.matcher = matcher;
+  public WindowFilter(double buffer) {
+    this.buffer = buffer;
   }
 
-  private FeatureMatcher matcher;
-
   /**
-   * For each target feature, finds matches among the candidate features.
-   * @return a map of target-feature to matching-features (a Matches object)
+   * Creates a WindowFilter, with no envelope buffering.
    */
-  public Map match(FeatureCollection targetFC, FeatureCollection candidateFC) {
-    TreeMap map = new TreeMap();
-    for (Iterator i = targetFC.iterator(); i.hasNext(); ) {
-      Feature subjectFeature = (Feature) i.next();
-      map.put(subjectFeature, matcher.match(subjectFeature, candidateFC));
-    }
-    return map;
+  public WindowFilter() {}
+
+  private double buffer;
+  /**
+   * Quickly filters out shapes that lie outside a given distance from the feature's
+   * envelope.
+   * @param target the feature to match
+   * @param candidates the features to search for matches
+   * @return the candidates with envelopes intersecting the window. Each will
+   * have a score of 1.
+   */
+  public Matches match(Feature target, FeatureCollection candidates) {
+    Envelope window = new Envelope(target.getGeometry().getEnvelopeInternal());
+    window = EnvelopeUtil.expand(window, buffer);
+    return new Matches(candidates.getFeatureSchema(), candidates.query(window));
   }
 }
